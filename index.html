@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>실험 노트 - Lab Notebook</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script type="text/javascript" language="javascript" src="jsme/jsme.nocache.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background: #ffffff;
+            border: 2px solid #1a73e8;
+            border-radius: 12px 12px 0 0;
+            color: #1a73e8;
+            padding: 32px 30px;
+            text-align: center;
+        }
+
+        .header .logo-img {
+            display: block;
+            margin: 0 auto 10px auto;
+            max-width: 260px;
+            width: 60%;
+            height: auto;
+        }
+
+        .header .lab-note {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #1a73e8;
+            margin: 0;
+        }
+
+        .controls {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 0 12px;
+        }
+
+        .search-box input {
+            flex: 1;
+            border: none;
+            padding: 10px;
+            outline: none;
+        }
+
+        .sort-btn {
+            padding: 8px 14px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .sort-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .add-user {
+            padding: 20px 30px;
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            gap: 10px;
+        }
+
+        .add-user input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            max-width: 300px;
+        }
+
+        .add-user button {
+            padding: 10px 16px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .content {
+            padding: 30px;
+            min-height: 400px;
+        }
+
+        .user-folder {
+            margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+        }
+
+        .folder-header {
+            padding: 16px 20px;
+            background: #f8f9fa;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .folder-header:hover {
+            background: #efefef;
+        }
+
+        .folder-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .folder-icon {
+            font-size: 18px;
+            transition: transform 0.3s;
+        }
+
+        .folder-header.collapsed .folder-icon {
+            transform: rotate(-90deg);
+        }
+
+        .folder-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .folder-buttons button {
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .projects {
+            margin-left: 20px;
+        }
+
+        .project {
+            margin-top: 12px;
+            padding: 12px;
+            background: white;
+            border-left: 2px solid #764ba2;
+        }
+
+        .project-header {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px;
+        }
+
+        .project-header:hover {
+            background: #f5f5f5;
+        }
+
+        .project-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .project-icon {
+            font-size: 14px;
+            transition: transform 0.3s;
+        }
+
+        .project-header.collapsed .project-icon {
+            transform: rotate(-90deg);
+        }
+
+        .project-buttons {
+            display: flex;
+            gap: 6px;
+        }
+
+        .project-buttons button {
+            padding: 4px 8px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .notes {
+            margin-top: 8px;
+        }
+
+        .notes.hidden {
+            display: none;
+        }
+
+        .note-item {
+            padding: 12px;
+            background: white;
+            margin-top: 4px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 1px solid #e0e0e0;
+        }
+
+        .note-item:hover {
+            background: #f0f3ff;
+        }
+
+        .note-date {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .note-title {
+            font-weight: 600;
+            font-size: 14px;
+            margin: 4px 0;
+        }
+
+        .note-result {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .detail-page {
+            display: none;
+        }
+
+        .detail-page.show {
+            display: block;
+        }
+
+        .detail-header {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            display: flex;
+            gap: 12px;
+        }
+
+        .detail-header button {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .detail-body {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #667eea;
+        }
+
+        .section-content {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 4px;
+            line-height: 1.6;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .editor-toolbar {
+            display: flex;
+            gap: 8px;
+            padding: 10px;
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            border-radius: 6px 6px 0 0;
+            flex-wrap: wrap;
+        }
+
+        .editor-toolbar button,
+        .editor-toolbar select {
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        #richEditor {
+            border: 1px solid #ddd;
+            border-radius: 0 0 6px 6px;
+            padding: 10px;
+            min-height: 180px;
+            font-family: inherit;
+        }
+
+        #richEditor:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: flex-end;
+        }
+
+        .buttons button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-save {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-cancel {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-edit {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .structure-box {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: #f8f9fa;
+            min-height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            overflow: hidden;
+        }
+
+        .structure-box svg {
+            max-width: 100%;
+            max-height: 220px;
+            height: auto;
+        }
+
+        .structure-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .structure-actions button {
+            padding: 8px 14px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .structure-actions .btn-draw {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .structure-actions .btn-clear {
+            color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        #structureModal .modal-content {
+            max-width: 920px;
+            width: 95%;
+        }
+
+        .library-panel {
+            width: 260px;
+            flex-shrink: 0;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 12px;
+            background: #f8f9fa;
+        }
+
+        .lib-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 6px;
+        }
+
+        .lib-item-thumb {
+            width: 48px;
+            height: 40px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .lib-item-thumb svg {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .lib-item-name {
+            flex: 1;
+            font-size: 12px;
+            font-weight: 600;
+            word-break: break-all;
+        }
+
+        .lib-item-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .lib-item-actions button {
+            font-size: 10px;
+            padding: 3px 6px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        #jsmeContainer {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 420px;
+            background: #fafafa;
+        }
+
+        .section-content.structure-view {
+            background: white;
+            display: flex;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .section-content.structure-view svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .footer {
+            padding: 20px;
+            background: #f8f9fa;
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .msg {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 6px;
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img class="logo-img" src="data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCACyAYMDASIAAhEBAxEB/8QAHAABAAIDAQEBAAAAAAAAAAAAAAYHBAUIAwIB/8QAVBAAAQMEAAMEBgINBggPAAAAAQACAwQFBhEHEiETMUFhCBQiUXGBMpEVFhcjN0JTdaGxs8HhNjhygpSyGFJidJKiwtEkM0NIVFVWZHN2hpO0xNL/xAAcAQEAAgMBAQEAAAAAAAAAAAAAAwQCBQYHAQj/xAA3EQABBAEBBQYEBAYDAQAAAAABAAIDEQQhBRIxQZETUWFxgaEGIrHBFTJT0RRCUnLh8Adi8ZL/2gAMAwEAAhEDEQA/AOy0REREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREREVYZ1kl3s+aSChq3CJkbNwv6sPTZ6fvHVbvHOIVrrwIrkBQT/AOMTuN3z8Pn9a0se3sR2Q7Hed1zSRrwNeP7quMlhcWnQr34kZ1QYRT0MtZTS1LquUsDI3AODWj2nde/Wx081tcWyex5NRCqs1fHUAAF8fdJH5Oaeo/UqD9JG8xXHNoKGnlEkVDTNBLTsc7/aOv6paq5tVyr7VWsrbbVzUlQz6MkTi0/DzHkvVcP4Uiy9nRyh27IRfgb4aeXcuayPiF+PmPZVsGnj4+67aRUhgHG5juyoMuh5Xa5RXQt6E+97B3fFv1K57dXUdxoo62gqYqmmlG2SxODmuHxC5TaGy8nAfuztruPI+v8ApXQ4efBmNuJ3pzCyERFr1cRERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERF8yyMijdLK9rGMG3OcdAD3lfkE0M8QlglZLGe5zHAg/MIvtGrUTzPIrjYrxA2FsUtNJCDyPb+MCd6I+S9rTnFoqw1lVz0Up6Hn6s3/SH79LC4sUvNQUdYB/xchjP9YbH939KrpefbU21nbN2g9jXW3QgHXiOXNdfgbMxc3Da5wp3Cws7iVNHUZfVSRSMkZys05p2D7I8VGl53F7hXSaOta/Utdeq10FpqXHo4s5QR7z0/eufx437X2i2Jop0rwPLeP2tea7RAx5pRdhpPsVCrnUetXCeo3sPeSPh4foWMiL9swQsgibEwUGgAeQ0C88c4uJJ5ot7iOWX3Fq0VNnrnxNJ3JC72opP6Tf39/mtEi+yxMmYWSCweRWUcj43BzDRC6YwDjBY792VFeOW03Bx5fbd95kPk492/cfrKs1pDmhzSCCNgjxXDSnGBcTcixQsp2zev24HrSzuJ5R48ju9v6R5Lh9q/B7XXJhGv+p+x/fquq2f8SkUzJF+I+4/bourUUawDNLPmdvkqbaZI5YCBPBKNOjJ3ryIOj1HuUlXBzwSQSGOUU4cQutilZMwPYbBRERRKRERERERERERERERERERERERERERERERERERERERERERERERERERERERERERE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" alt="Polaris AI Pharma">
+            <p class="lab-note">Lab Note</p>
+        </div>
+
+        <!-- 검색 및 정렬 -->
+        <div class="controls">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="search" placeholder="검색...">
+            </div>
+            <button class="sort-btn active" id="sortDesc">최신순</button>
+            <button class="sort-btn" id="sortAsc">오래된순</button>
+        </div>
+
+        <!-- 사용자 추가 -->
+        <div class="add-user">
+            <input type="text" id="newUser" placeholder="새 사용자...">
+            <button id="addUserBtn">+ 추가</button>
+        </div>
+
+        <!-- 리스트 화면 -->
+        <div id="listView" class="content">
+            <div id="userList"></div>
+        </div>
+
+        <!-- 상세보기 -->
+        <div id="detailView" class="detail-page">
+            <div class="detail-header">
+                <button onclick="goList()">← 돌아가기</button>
+                <span id="detailTitle" style="flex:1; text-align:center; font-weight:600;"></span>
+            </div>
+            <div class="detail-body" id="detailBody"></div>
+        </div>
+
+        <!-- 편집 -->
+        <div id="editView" class="detail-page">
+            <div class="detail-header">
+                <button onclick="goList()">← 돌아가기</button>
+                <span id="editTitle" style="flex:1; text-align:center; font-weight:600;"></span>
+            </div>
+            <div class="detail-body">
+                <form id="editForm" onsubmit="saveNote(event)">
+                    <div class="form-group">
+                        <label>날짜</label>
+                        <input type="date" id="noteDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>제목</label>
+                        <input type="text" id="noteTitle" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>샘플</label>
+                            <input type="text" id="noteSample" required>
+                        </div>
+                        <div class="form-group">
+                            <label>결과</label>
+                            <input type="text" id="noteResult" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>실험 노트</label>
+                        <div class="editor-toolbar">
+                            <select id="fontSize">
+                                <option value="">크기</option>
+                                <option value="1">1pt</option>
+                                <option value="2">2pt</option>
+                                <option value="3">3pt</option>
+                                <option value="4">4pt</option>
+                                <option value="5">5pt</option>
+                                <option value="6">6pt</option>
+                                <option value="7">7pt</option>
+                                <option value="8">8pt</option>
+                                <option value="9">9pt</option>
+                                <option value="10">10pt</option>
+                                <option value="11">11pt</option>
+                                <option value="12">12pt</option>
+                                <option value="13">13pt</option>
+                                <option value="14">14pt</option>
+                                <option value="15">15pt</option>
+                                <option value="16">16pt</option>
+                                <option value="17">17pt</option>
+                                <option value="18">18pt</option>
+                                <option value="19">19pt</option>
+                                <option value="20">20pt</option>
+                                <option value="21">21pt</option>
+                                <option value="22">22pt</option>
+                                <option value="23">23pt</option>
+                                <option value="24">24pt</option>
+                                <option value="25">25pt</option>
+                                <option value="26">26pt</option>
+                                <option value="27">27pt</option>
+                                <option value="28">28pt</option>
+                                <option value="29">29pt</option>
+                                <option value="30">30pt</option>
+                            </select>
+                            <button type="button" onclick="fmt('bold')"><i class="fas fa-bold"></i></button>
+                            <button type="button" onclick="fmt('italic')"><i class="fas fa-italic"></i></button>
+                            <button type="button" onclick="fmt('underline')"><i class="fas fa-underline"></i></button>
+                            <button type="button" onclick="addTable()">표</button>
+                        </div>
+                        <div id="experimentNote" contenteditable="true" style="border: 1px solid #ddd; border-radius: 0 0 6px 6px; padding: 10px; min-height: 180px; font-family: inherit;"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>구조식 (선택)</label>
+                        <div class="structure-box" id="structurePreview">
+                            <span style="color:#999;">구조식 없음</span>
+                        </div>
+                        <div class="structure-actions">
+                            <button type="button" class="btn-draw" onclick="openStructureModal()"><i class="fas fa-pen"></i> 구조 그리기 / 수정</button>
+                            <button type="button" class="btn-clear" onclick="clearStructure()">삭제</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>기기</label>
+                        <input type="text" id="noteEquip">
+                    </div>
+                    <div class="form-group">
+                        <label>메모</label>
+                        <textarea id="noteNotes" style="min-height:80px;"></textarea>
+                    </div>
+                    <div class="buttons">
+                        <button type="button" class="btn-cancel" onclick="goList()">취소</button>
+                        <button type="submit" class="btn-save">저장</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="footer">© 2025 Polaris AI Pharma Lab Notebook</div>
+    </div>
+
+    <!-- 모달 -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalTitle"></h3>
+            <p id="modalMsg"></p>
+            <div style="margin-top:20px; display:flex; gap:10px; justify-content:flex-end;">
+                <button onclick="closeModal()" style="padding:8px 16px; background:#f0f0f0; border:none; border-radius:4px; cursor:pointer;">취소</button>
+                <button onclick="confirmModal()" style="padding:8px 16px; background:#667eea; color:white; border:none; border-radius:4px; cursor:pointer;">삭제</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 표 삽입 모달 -->
+    <div id="tableModal" class="modal">
+        <div class="modal-content" style="max-width: 350px;">
+            <h3>표 삽입</h3>
+            <div style="margin: 20px 0;">
+                <label style="display: block; margin-bottom: 10px;">
+                    행 수: <input type="number" id="tableRows" min="1" max="20" value="3" style="width: 60px; padding: 4px;">
+                </label>
+                <label style="display: block; margin-bottom: 20px;">
+                    열 수: <input type="number" id="tableCols" min="1" max="20" value="3" style="width: 60px; padding: 4px;">
+                </label>
+            </div>
+            <div style="display:flex; gap:10px; justify-content:flex-end;">
+                <button onclick="closeTableModal()" style="padding:8px 16px; background:#f0f0f0; border:none; border-radius:4px; cursor:pointer;">취소</button>
+                <button onclick="insertTableWithSize()" style="padding:8px 16px; background:#667eea; color:white; border:none; border-radius:4px; cursor:pointer;">생성</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 구조식 그리기 모달 -->
+    <div id="structureModal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom:14px;">구조식 그리기</h3>
+            <div style="display:flex; gap:16px; align-items:flex-start;">
+                <div id="jsmeContainer" style="flex-shrink:0;"></div>
+                <div class="library-panel">
+                    <div style="font-weight:600; margin-bottom:8px; font-size:13px;">📚 내 구조 라이브러리</div>
+                    <div style="display:flex; gap:6px; margin-bottom:10px;">
+                        <input type="text" id="libNameInput" placeholder="이름 (예: Boc)" style="flex:1; padding:6px; border:1px solid #ddd; border-radius:4px; font-size:12px;">
+                        <button onclick="saveCurrentToLibrary()" style="padding:6px 10px; background:#28a745; color:white; border:none; border-radius:4px; cursor:pointer; font-size:12px; white-space:nowrap;">저장</button>
+                    </div>
+                    <div id="libraryList" style="display:flex; flex-direction:column; gap:6px; max-height:340px; overflow-y:auto;"></div>
+                </div>
+            </div>
+            <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:16px;">
+                <button onclick="closeStructureModal()" style="padding:8px 16px; background:#f0f0f0; border:none; border-radius:4px; cursor:pointer;">취소</button>
+                <button onclick="saveStructureModal()" style="padding:8px 16px; background:#667eea; color:white; border:none; border-radius:4px; cursor:pointer;">적용</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const data = {
+            "이지원": {
+                projects: {
+                    "프로젝트 A": [
+                        {date:"2025-01-28", title:"Na 함량", sample:"STD_001", result:"95.2%", desc:"", equip:"FAAS", notes:"R²=0.9998", content:""}
+                    ]
+                }
+            },
+            "박준호": {
+                projects: {
+                    "기기검증": [
+                        {date:"2025-01-27", title:"FAAS 캘", sample:"Cal_50", result:"R²=0.9998", desc:"", equip:"FAAS", notes:"", content:""}
+                    ]
+                }
+            }
+        };
+
+        let search = "", sort = "desc", expanded = {}, editState = null;
+
+        // 구조식(JSME) 관련 상태
+        let jsmeApplet = null, jsmeLibLoaded = false;
+        let editStructureSmiles = '', editStructureSvg = '';
+
+        function jsmeOnLoad() {
+            jsmeLibLoaded = true;
+        }
+
+        function ensureJsmeApplet(callback) {
+            if(jsmeApplet) { callback(); return; }
+            if(jsmeLibLoaded) {
+                jsmeApplet = new JSApplet.JSME('jsmeContainer', '600px', '400px');
+                callback();
+                return;
+            }
+            let tries = 0;
+            const iv = setInterval(() => {
+                tries++;
+                if(jsmeLibLoaded) {
+                    clearInterval(iv);
+                    jsmeApplet = new JSApplet.JSME('jsmeContainer', '600px', '400px');
+                    callback();
+                } else if(tries > 100) {
+                    clearInterval(iv);
+                    alert('구조 편집기를 불러오지 못했습니다. 인터넷 연결을 확인해주세요.');
+                }
+            }, 100);
+        }
+
+        function openStructureModal() {
+            document.getElementById('structureModal').classList.add('show');
+            renderLibraryList();
+            ensureJsmeApplet(() => {
+                if(editStructureSmiles) {
+                    jsmeApplet.readGenericMolecularInput(editStructureSmiles);
+                } else {
+                    jsmeApplet.reset();
+                }
+            });
+        }
+
+        function closeStructureModal() {
+            document.getElementById('structureModal').classList.remove('show');
+        }
+
+        function saveStructureModal() {
+            if(jsmeApplet) {
+                const smiles = jsmeApplet.smiles();
+                editStructureSmiles = smiles;
+                editStructureSvg = smiles ? jsmeApplet.getMolecularAreaGraphicsString() : '';
+                updateStructurePreview();
+            }
+            closeStructureModal();
+        }
+
+        function clearStructure() {
+            editStructureSmiles = '';
+            editStructureSvg = '';
+            if(jsmeApplet) jsmeApplet.reset();
+            updateStructurePreview();
+        }
+
+        function updateStructurePreview() {
+            const el = document.getElementById('structurePreview');
+            el.innerHTML = editStructureSvg ? editStructureSvg : '<span style="color:#999;">구조식 없음</span>';
+        }
+
+        // 내 구조 라이브러리
+        let structureLibrary = [];
+
+        function loadLibrary() {
+            try {
+                const raw = localStorage.getItem('structureLibrary');
+                structureLibrary = raw ? JSON.parse(raw) : [];
+            } catch(e) {
+                structureLibrary = [];
+            }
+        }
+
+        function saveLibraryData() {
+            localStorage.setItem('structureLibrary', JSON.stringify(structureLibrary));
+        }
+
+        function renderLibraryList() {
+            const el = document.getElementById('libraryList');
+            if(structureLibrary.length === 0) {
+                el.innerHTML = '<div style="font-size:12px; color:#999; text-align:center; padding:20px 0;">저장된 구조가 없습니다.</div>';
+                return;
+            }
+            el.innerHTML = structureLibrary.map(item => `
+                <div class="lib-item">
+                    <div class="lib-item-thumb">${item.svg || ''}</div>
+                    <div class="lib-item-name">${item.name}</div>
+                    <div class="lib-item-actions">
+                        <button onclick="insertFromLibrary('${item.id}')">불러오기</button>
+                        <button onclick="deleteFromLibrary('${item.id}')" style="color:#dc3545;">삭제</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function saveCurrentToLibrary() {
+            if(!jsmeApplet) { alert('먼저 구조를 그려주세요.'); return; }
+            const smiles = jsmeApplet.smiles();
+            if(!smiles) { alert('저장할 구조가 없습니다.'); return; }
+            const nameInput = document.getElementById('libNameInput');
+            const name = nameInput.value.trim();
+            if(!name) { alert('이름을 입력해주세요 (예: Boc, Fmoc).'); return; }
+            const svg = jsmeApplet.getMolecularAreaGraphicsString();
+            structureLibrary.push({ id: Date.now().toString(), name, smiles, svg });
+            saveLibraryData();
+            renderLibraryList();
+            nameInput.value = '';
+            msg('라이브러리에 저장됨');
+        }
+
+        function insertFromLibrary(id) {
+            const item = structureLibrary.find(x => x.id === id);
+            if(!item || !jsmeApplet) return;
+            const current = jsmeApplet.smiles();
+            const combined = current ? (current + '.' + item.smiles) : item.smiles;
+            jsmeApplet.readGenericMolecularInput(combined);
+        }
+
+        function deleteFromLibrary(id) {
+            if(!confirm('이 구조를 라이브러리에서 삭제할까요?')) return;
+            structureLibrary = structureLibrary.filter(x => x.id !== id);
+            saveLibraryData();
+            renderLibraryList();
+        }
+
+        // 저장/로드
+        function saveAll() {
+            localStorage.setItem('notebook', JSON.stringify({data, expanded}));
+        }
+
+        function loadAll() {
+            const saved = localStorage.getItem('notebook');
+            if(saved) {
+                const parsed = JSON.parse(saved);
+                Object.assign(data, parsed.data);
+                Object.assign(expanded, parsed.expanded);
+            }
+            Object.keys(data).forEach(u => {
+                if(!(u in expanded)) expanded[u] = true;
+                Object.keys(data[u].projects).forEach(p => {
+                    if(!((u+"::"+p) in expanded)) expanded[u+"::"+p] = true;
+                });
+            });
+        }
+
+        // 렌더
+        function render() {
+            const q = search.trim().toLowerCase();
+
+            const html = Object.keys(data).sort().map(user => {
+                const proj = data[user].projects;
+                const total = Object.values(proj).flat().length;
+                const isExp = expanded[user];
+
+                // 사용자(폴더)명이 검색어와 일치하는지
+                const userMatch = q && user.toLowerCase().includes(q);
+
+                const projectsArr = Object.entries(proj).map(([pname, notes]) => {
+                    const pkey = user + "::" + pname;
+                    const pExp = expanded[pkey];
+
+                    // 프로젝트명이 검색어와 일치하는지
+                    const projMatch = q && pname.toLowerCase().includes(q);
+
+                    // 노트 필터링 (원본 인덱스 유지)
+                    let entries = notes.map((n, idx) => ({n, idx}));
+                    if (q && !userMatch && !projMatch) {
+                        // 키워드 검색: 제목/샘플/결과에 포함된 노트만
+                        entries = entries.filter(({n}) =>
+                            n.title.toLowerCase().includes(q) ||
+                            n.sample.toLowerCase().includes(q) ||
+                            n.result.toLowerCase().includes(q)
+                        );
+                    }
+
+                    entries.sort((a, b) => sort=='desc'
+                        ? new Date(b.n.date) - new Date(a.n.date)
+                        : new Date(a.n.date) - new Date(b.n.date));
+
+                    // 이 프로젝트가 결과에 표시되어야 하는지
+                    const projVisible = !q || userMatch || projMatch || entries.length > 0;
+
+                    return { pname, pkey, pExp, entries, projVisible };
+                });
+
+                // 표시할 프로젝트만
+                const visibleProjects = projectsArr.filter(p => p.projVisible);
+
+                // 이 사용자 폴더가 표시되어야 하는지
+                const userVisible = !q || userMatch || visibleProjects.length > 0;
+                if (!userVisible) return '';
+
+                const projects = visibleProjects.map(({pname, pkey, pExp, entries}) => {
+                    return `
+                        <div class="project">
+                            <div class="project-header ${!pExp?'collapsed':''}" onclick="toggle('${pkey}')">
+                                <div class="project-left">
+                                    <span class="project-icon">📁</span>
+                                    <span>${pname}</span>
+                                </div>
+                                <div class="project-buttons">
+                                    <button onclick="newNote('${user}','${pname}'); event.stopPropagation()">+</button>
+                                    <button onclick="renameProject('${user}','${pname}'); event.stopPropagation()">✏️</button>
+                                    <button onclick="delProject('${user}','${pname}'); event.stopPropagation()">🗑</button>
+                                </div>
+                            </div>
+                            <div class="notes ${!pExp?'hidden':''}">
+                                ${entries.length ? entries.map(({n, idx}) => `
+                                    <div class="note-item" onclick="showDetail('${user}','${pname}',${idx})">
+                                        <div class="note-date">${n.date}</div>
+                                        <div class="note-title">${n.title}</div>
+                                        <div class="note-result">${n.result}</div>
+                                    </div>
+                                `).join('') : '<div style="padding:10px; color:#999;">없음</div>'}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                return `
+                    <div class="user-folder">
+                        <div class="folder-header ${!isExp?'collapsed':''}" onclick="toggle('${user}')">
+                            <div class="folder-left">
+                                <span class="folder-icon">📂</span>
+                                <span>${user}</span>
+                            </div>
+                            <div class="folder-buttons">
+                                <button onclick="newProject('${user}'); event.stopPropagation()">📁+</button>
+                                <button onclick="renameUser('${user}'); event.stopPropagation()">✏️</button>
+                                <button onclick="delUser('${user}'); event.stopPropagation()">🗑</button>
+                            </div>
+                        </div>
+                        ${isExp ? `<div class="projects">${projects}</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+
+            const out = html.trim();
+            document.getElementById('userList').innerHTML = out ||
+                (search.trim()
+                    ? '<div style="text-align:center; color:#999;">검색 결과가 없습니다</div>'
+                    : '<div style="text-align:center; color:#999;">사용자 추가하세요</div>');
+        }
+
+        function toggle(key) {
+            expanded[key] = !expanded[key];
+            saveAll();
+            render();
+        }
+
+        // 사용자
+        document.getElementById('addUserBtn').onclick = () => {
+            const name = document.getElementById('newUser').value.trim();
+            if(!name || name in data) return alert('오류');
+            data[name] = {projects: {"일반":[]}};
+            expanded[name] = true;
+            document.getElementById('newUser').value = '';
+            saveAll();
+            render();
+            msg('추가됨');
+        };
+
+        function newProject(user) {
+            const name = prompt('프로젝트명:');
+            if(!name || name in data[user].projects) return alert('오류');
+            data[user].projects[name] = [];
+            expanded[user+"::"+name] = true;
+            saveAll();
+            render();
+            msg('생성됨');
+        }
+
+        function delUser(user) {
+            if(confirm(`${user} 삭제?`)) {
+                delete data[user];
+                saveAll();
+                render();
+                msg('삭제됨');
+            }
+        }
+
+        function delProject(user, proj) {
+            if(confirm(`${proj} 삭제?`)) {
+                delete data[user].projects[proj];
+                saveAll();
+                render();
+                msg('삭제됨');
+            }
+        }
+
+        // 사용자(폴더) 이름 변경
+        function renameUser(oldName) {
+            const newName = prompt('새 사용자 이름:', oldName);
+            if(newName === null) return;            // 취소
+            const trimmed = newName.trim();
+            if(!trimmed || trimmed === oldName) return;
+            if(trimmed in data) return alert('이미 존재하는 이름입니다.');
+
+            // 키 순서를 유지하면서 이름만 교체
+            const newData = {};
+            Object.keys(data).forEach(k => {
+                newData[k === oldName ? trimmed : k] = data[k];
+            });
+            // data 객체 내용 교체
+            Object.keys(data).forEach(k => delete data[k]);
+            Object.assign(data, newData);
+
+            // expanded 상태도 이전 (폴더 + 하위 프로젝트)
+            if(oldName in expanded) {
+                expanded[trimmed] = expanded[oldName];
+                delete expanded[oldName];
+            }
+            Object.keys(expanded).forEach(key => {
+                if(key.startsWith(oldName + "::")) {
+                    const newKey = trimmed + "::" + key.slice((oldName + "::").length);
+                    expanded[newKey] = expanded[key];
+                    delete expanded[key];
+                }
+            });
+
+            saveAll();
+            render();
+            msg('이름이 변경되었습니다.');
+        }
+
+        // 프로젝트 이름 변경
+        function renameProject(user, oldName) {
+            const newName = prompt('새 프로젝트 이름:', oldName);
+            if(newName === null) return;            // 취소
+            const trimmed = newName.trim();
+            if(!trimmed || trimmed === oldName) return;
+            if(trimmed in data[user].projects) return alert('이미 존재하는 프로젝트입니다.');
+
+            // 키 순서 유지하면서 교체
+            const projects = data[user].projects;
+            const newProjects = {};
+            Object.keys(projects).forEach(k => {
+                newProjects[k === oldName ? trimmed : k] = projects[k];
+            });
+            data[user].projects = newProjects;
+
+            // expanded 상태 이전
+            const oldKey = user + "::" + oldName;
+            const newKey = user + "::" + trimmed;
+            if(oldKey in expanded) {
+                expanded[newKey] = expanded[oldKey];
+                delete expanded[oldKey];
+            }
+
+            saveAll();
+            render();
+            msg('이름이 변경되었습니다.');
+        }
+
+        // 노트
+        function newNote(user, proj) {
+            editState = {user, proj, idx: null};
+            document.getElementById('editTitle').textContent = user + ' > ' + proj + ' - 새 노트';
+            document.getElementById('editForm').reset();
+            document.getElementById('noteDate').valueAsDate = new Date();
+            document.getElementById('experimentNote').innerHTML = '';
+            editStructureSmiles = '';
+            editStructureSvg = '';
+            updateStructurePreview();
+            showView('edit');
+        }
+
+        function showDetail(user, proj, idx) {
+            const note = data[user].projects[proj][idx];
+            editState = {user, proj, idx};
+            
+            let html = `
+                <div class="section">
+                    <div class="section-title">📅 ${note.date}</div>
+                    <div class="section-content"><strong>${note.title}</strong></div>
+                </div>
+                <div class="section">
+                    <div class="section-title">🧪 샘플</div>
+                    <div class="section-content">${note.sample}</div>
+                </div>
+                <div class="section">
+                    <div class="section-title">📊 결과</div>
+                    <div class="section-content">${note.result}</div>
+                </div>
+            `;
+            if(note.desc) html += `<div class="section"><div class="section-title">📓 실험 노트</div><div class="section-content" style="white-space: normal;">${note.desc}</div></div>`;
+            if(note.structureSvg) html += `<div class="section"><div class="section-title">🧬 구조식</div><div class="section-content structure-view">${note.structureSvg}</div></div>`;
+            if(note.equip) html += `<div class="section"><div class="section-title">🔧 기기</div><div class="section-content">${note.equip}</div></div>`;
+            if(note.notes) html += `<div class="section"><div class="section-title">📌 메모</div><div class="section-content">${note.notes}</div></div>`;
+            
+            html += `
+                <div style="margin-top:30px; display:flex; gap:10px;">
+                    <button class="btn-edit" onclick="editNote()">수정</button>
+                    <button class="btn-delete" onclick="showDeleteModal()">삭제</button>
+                </div>
+            `;
+            
+            document.getElementById('detailTitle').textContent = note.title;
+            document.getElementById('detailBody').innerHTML = html;
+            showView('detail');
+        }
+
+        function editNote() {
+            const note = data[editState.user].projects[editState.proj][editState.idx];
+            document.getElementById('editTitle').textContent = editState.user + ' > ' + editState.proj + ' - 수정';
+            document.getElementById('noteDate').value = note.date;
+            document.getElementById('noteTitle').value = note.title;
+            document.getElementById('noteSample').value = note.sample;
+            document.getElementById('noteResult').value = note.result;
+            document.getElementById('experimentNote').innerHTML = note.desc;
+            document.getElementById('noteEquip').value = note.equip;
+            document.getElementById('noteNotes').value = note.notes;
+            editStructureSmiles = note.structureSmiles || '';
+            editStructureSvg = note.structureSvg || '';
+            updateStructurePreview();
+            showView('edit');
+        }
+
+        function saveNote(e) {
+            e.preventDefault();
+            const note = {
+                date: document.getElementById('noteDate').value,
+                title: document.getElementById('noteTitle').value,
+                sample: document.getElementById('noteSample').value,
+                result: document.getElementById('noteResult').value,
+                desc: document.getElementById('experimentNote').innerHTML,
+                equip: document.getElementById('noteEquip').value,
+                notes: document.getElementById('noteNotes').value,
+                structureSmiles: editStructureSmiles,
+                structureSvg: editStructureSvg
+            };
+            
+            if(editState.idx !== null) {
+                data[editState.user].projects[editState.proj][editState.idx] = note;
+                msg('수정됨');
+            } else {
+                data[editState.user].projects[editState.proj].push(note);
+                msg('저장됨');
+            }
+            saveAll();
+            render();
+            goList();
+        }
+
+        function showDeleteModal() {
+            document.getElementById('modalTitle').textContent = '삭제';
+            document.getElementById('modalMsg').textContent = '정말 삭제?';
+            document.getElementById('modal').classList.add('show');
+        }
+
+        function confirmModal() {
+            data[editState.user].projects[editState.proj].splice(editState.idx, 1);
+            saveAll();
+            render();
+            closeModal();
+            goList();
+            msg('삭제됨');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('show');
+        }
+
+        // 뷰
+        function showView(view) {
+            document.getElementById('listView').style.display = view=='list'?'block':'none';
+            document.getElementById('detailView').classList.toggle('show', view=='detail');
+            document.getElementById('editView').classList.toggle('show', view=='edit');
+        }
+
+        function goList() {
+            showView('list');
+        }
+
+        // 검색/정렬
+        document.getElementById('search').oninput = (e) => {
+            search = e.target.value;
+            render();
+        };
+
+        document.getElementById('sortDesc').onclick = () => {
+            sort = 'desc';
+            document.getElementById('sortDesc').classList.add('active');
+            document.getElementById('sortAsc').classList.remove('active');
+            render();
+        };
+
+        document.getElementById('sortAsc').onclick = () => {
+            sort = 'asc';
+            document.getElementById('sortAsc').classList.add('active');
+            document.getElementById('sortDesc').classList.remove('active');
+            render();
+        };
+
+        // 에디터 - 커서(선택 영역) 저장
+        let savedRange = null;
+
+        const editorEl = document.getElementById('experimentNote');
+        editorEl.addEventListener('keyup', saveRange);
+        editorEl.addEventListener('mouseup', saveRange);
+        editorEl.addEventListener('focus', saveRange);
+
+        function saveRange() {
+            const sel = window.getSelection();
+            if(sel.rangeCount > 0 && editorEl.contains(sel.anchorNode)) {
+                savedRange = sel.getRangeAt(0).cloneRange();
+            }
+        }
+
+        function restoreRange() {
+            editorEl.focus();
+            if(savedRange) {
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(savedRange);
+            }
+        }
+
+        function fmt(cmd) {
+            restoreRange();
+            document.execCommand(cmd);
+            saveRange();
+        }
+
+        // 폰트 크기 - pt 단위로 직접 적용
+        function applyFontSize(pt) {
+            restoreRange();
+            const sel = window.getSelection();
+            if(!sel.rangeCount) return;
+            const range = sel.getRangeAt(0);
+
+            if(range.collapsed) {
+                // 선택 영역 없으면 이후 입력에 적용되도록 빈 span 삽입
+                const span = document.createElement('span');
+                span.style.fontSize = pt + 'pt';
+                span.innerHTML = '\u200B'; // zero-width space
+                range.insertNode(span);
+                // 커서를 span 안으로 이동
+                const newRange = document.createRange();
+                newRange.setStart(span.firstChild, 1);
+                newRange.collapse(true);
+                sel.removeAllRanges();
+                sel.addRange(newRange);
+            } else {
+                // 선택 영역을 span으로 감싸기
+                const span = document.createElement('span');
+                span.style.fontSize = pt + 'pt';
+                try {
+                    span.appendChild(range.extractContents());
+                    range.insertNode(span);
+                    // 선택 유지
+                    const newRange = document.createRange();
+                    newRange.selectNodeContents(span);
+                    sel.removeAllRanges();
+                    sel.addRange(newRange);
+                } catch(err) {
+                    document.execCommand('fontSize', false, '7');
+                }
+            }
+            saveRange();
+        }
+
+        function addTable() {
+            saveRange();
+            document.getElementById('tableModal').classList.add('show');
+        }
+
+        function closeTableModal() {
+            document.getElementById('tableModal').classList.remove('show');
+        }
+
+        function insertTableWithSize() {
+            const rows = parseInt(document.getElementById('tableRows').value);
+            const cols = parseInt(document.getElementById('tableCols').value);
+            
+            if(!rows || !cols || rows < 1 || cols < 1 || rows > 20 || cols > 20) {
+                alert('행과 열은 각각 1~20 사이의 숫자를 입력해주세요.');
+                return;
+            }
+            
+            // 표 DOM 직접 생성
+            const table = document.createElement('table');
+            table.style.cssText = 'border-collapse: collapse; width: 100%; margin: 12px 0; border: 1px solid #333;';
+            
+            for(let r = 0; r < rows; r++) {
+                const tr = document.createElement('tr');
+                for(let c = 0; c < cols; c++) {
+                    const td = document.createElement('td');
+                    td.style.cssText = 'border: 1px solid #333; padding: 8px; min-width: 60px; width: ' + (100/cols) + '%;';
+                    if(r === 0) {
+                        td.style.backgroundColor = '#f0f0f0';
+                        td.style.fontWeight = '600';
+                        td.textContent = '헤더' + (c+1);
+                    } else {
+                        td.textContent = '내용';
+                    }
+                    tr.appendChild(td);
+                }
+                table.appendChild(tr);
+            }
+            
+            // 저장된 커서 위치에 삽입 (없으면 에디터 끝에 추가)
+            restoreRange();
+            const sel = window.getSelection();
+            if(savedRange && sel.rangeCount > 0 && editorEl.contains(sel.anchorNode)) {
+                const range = sel.getRangeAt(0);
+                range.deleteContents();
+                range.insertNode(table);
+                // 표 뒤에 줄바꿈 추가
+                const br = document.createElement('br');
+                table.parentNode.insertBefore(br, table.nextSibling);
+            } else {
+                editorEl.appendChild(table);
+                editorEl.appendChild(document.createElement('br'));
+            }
+            
+            closeTableModal();
+            saveRange();
+        }
+
+        function addList(type) {
+            restoreRange();
+            const html = type=='ul' ? '<ul><li>항목1</li><li>항목2</li></ul>' : '<ol><li>항목1</li><li>항목2</li></ol>';
+            document.execCommand('insertHTML', false, html);
+            saveRange();
+        }
+
+        document.getElementById('fontSize').addEventListener('change', (e) => {
+            if(e.target.value) {
+                applyFontSize(e.target.value);
+                e.target.value = '';
+            }
+        });
+
+        // 표 셀 크기 조정 - 셀 오른쪽 경계 근처에서만 드래그 (MS Word 방식)
+        document.addEventListener('mousemove', function(e) {
+            if(e.target.tagName === 'TD') {
+                const rect = e.target.getBoundingClientRect();
+                // 오른쪽 경계 6px 이내면 리사이즈 커서
+                if(rect.right - e.clientX < 6) {
+                    e.target.style.cursor = 'col-resize';
+                } else {
+                    e.target.style.cursor = 'text';
+                }
+            }
+        });
+
+        document.addEventListener('mousedown', function(e) {
+            if(e.target.tagName === 'TD') {
+                const cell = e.target;
+                const rect = cell.getBoundingClientRect();
+                // 오른쪽 경계 근처에서만 리사이즈 시작
+                if(rect.right - e.clientX >= 6) return;
+
+                e.preventDefault();
+                const originalX = e.pageX;
+                const originalWidth = cell.offsetWidth;
+                
+                function onMouseMove(moveEvent) {
+                    const diff = moveEvent.pageX - originalX;
+                    const newWidth = originalWidth + diff;
+                    if(newWidth > 40) {
+                        cell.style.width = newWidth + 'px';
+                    }
+                }
+                
+                function onMouseUp() {
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('mouseup', onMouseUp);
+                }
+                
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+            }
+        });
+
+        // 메시지
+        function msg(text) {
+            const el = document.createElement('div');
+            el.className = 'msg';
+            el.textContent = text;
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 2000);
+        }
+
+        // 초기화
+        document.getElementById('newUser').onkeypress = (e) => {
+            if(e.key=='Enter') document.getElementById('addUserBtn').click();
+        };
+
+        loadAll();
+        loadLibrary();
+        render();
+    </script>
+</body>
+</html>
